@@ -21,41 +21,52 @@ public class Board {
 
     /**
      * Determines whether a player has won or not
-     * @return true if player has won, false otherwise
+     * @return player that won, 0 if game is not over
      */
-    public boolean playerWon() {
+    public int playerWon() {
         int player;
-        for (int y = 0; y <= HEIGHT; y++) {
-            for (int x = 0; x < board[y].length; x++) {
-                if (board[y][x] != 0) {
-                    player = board[y][x];
+        for (int i = 0; i <= HEIGHT; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] != 0) {
+                    player = board[i][j];
 
                     // Ways to win
 
                     // Vertical
-                    if (y <= 2 && (board[y + 1][x] == player && board[y + 2][x] == player && board[y + 3][x] == player))
-                        return true;
+                    if (i <= 2 && (board[i + 1][j] == player && board[i + 2][j] == player && board[i + 3][j] == player))
+                        return player;
                     // Horizontal
-                    if (x <= 3 && (board[y][x + 1] == player && board[y][x + 2] == player && board[y][x + 3] == player))
-                        return true;
+                    if (j <= 3 && (board[i][j + 1] == player && board[i][j + 2] == player && board[i][j + 3] == player))
+                        return player;
                     // + Diagonal
-                    if (x <= 3 && y <= 2 && (board[y + 1][x + 1] == player && board[y + 2][x + 2] == player && board[y + 3][x + 3] == player))
-                        return true;
+                    if (j <= 3 && i <= 2 && (board[i + 1][j + 1] == player && board[i + 2][j + 2] == player && board[i + 3][j + 3] == player))
+                        return player;
                     // - Diagonal
-                    if (x >= 3 && y <= 2 && (board[y + 1][x - 1] == player && board[y + 2][x - 2] == player && board[y + 3][x - 3] == player))
-                        return true;
+                    if (j >= 3 && i <= 2 && (board[i + 1][j - 1] == player && board[i + 2][j - 2] == player && board[i + 3][j - 3] == player))
+                        return player;
                 }
             }
-        } return false;
+        } return 0;
+    }
+
+    public boolean boardIsFull() {
+        for(int[] row : board) {
+            for(int n : row) {
+                if(n==0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
      * Puts a token at the top of a column
      * @param player Player who owns the token
-     * @param x x coordinate of token
+     * @param j x coordinate of token
      */
-    public void putAtTop(int player, int x) {
-        board[HEIGHT][x] = player;
+    public void putAtTop(int player, int j) {
+        board[HEIGHT][j] = player;
     }
 
     /**
@@ -72,13 +83,14 @@ public class Board {
      * Moves a token down one space
      * @param player The person who owns the token
      * @param x x coordinate of space
-     * @param y y coordinate of previous space
-     * @return y coordinate of new space
      */
-    public int moveDown(int player, int x, int y) {
-        board[y][x] = 0;
-        board[y-1][x] = player;
-        return y-1;
+    public void moveDown(int player, int x) {
+        int y = HEIGHT;
+        while (isEmptyBelow(x, y)) {
+            board[y][x] = 0;
+            y-=1;
+            board[y][x] = player;
+        }
     }
 
     /**
@@ -96,11 +108,11 @@ public class Board {
      */
     public String toString() {
         StringBuilder ret = new StringBuilder();
-        for(int y=HEIGHT; y>=0; y--) {
+        for(int i=HEIGHT; i>=0; i--) {
             ret.append("\n| ");
-            for(int x=0; x<board[y].length; x++) {
-                switch(board[y][x]) {
-                    case 1 -> ret.append("+ ");
+            for(int j=0; j<board[i].length; j++) {
+                switch(board[i][j]) {
+                    case 1 -> ret.append("x ");
                     case 2 -> ret.append("o ");
                     default -> ret.append("  ");
                 }
